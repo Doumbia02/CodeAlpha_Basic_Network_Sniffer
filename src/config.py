@@ -67,7 +67,7 @@ without modifying the rest of the source code.
 #     "eth0"   -> Linux Ethernet
 #     "wlan0"  -> Linux Wi-Fi
 #
-NETWORK_INTERFACE = None
+NETWORK_INTERFACE = "en0"
 
 
 # Berkeley Packet Filter (BPF)
@@ -87,7 +87,7 @@ NETWORK_INTERFACE = None
 # "host 8.8.8.8"
 # "src host 192.168.1.10"
 #
-BPF_FILTER = None
+BPF_FILTER = ""
 
 
 # Maximum number of packets to capture.
@@ -95,7 +95,7 @@ BPF_FILTER = None
 # None means:
 # Capture indefinitely until the user presses Ctrl + C.
 #
-MAX_PACKET_COUNT = None
+MAX_PACKET_COUNT = 0
 
 
 # ==============================================================================
@@ -136,7 +136,7 @@ SHOW_PACKET_LENGTH = True
 
 ENABLE_LOGGING = True
 
-LOG_FILE = "../logs/sniffer.log"
+LOG_FILE = "logs/sniffer.log"
 
 LOG_LEVEL = "INFO"
 

@@ -4,7 +4,7 @@ main.py
 
 Entry point of the Network Packet Sniffer.
 """
-
+from cli import parse_arguments
 from scapy.all import sniff
 
 from config import (
@@ -23,8 +23,9 @@ from packet_parser import parse_packet
 from utils import (
     ensure_directory,
     print_banner,
-)
 
+)
+args = parse_arguments()
 
 def handle_packet(packet):
     """
@@ -66,12 +67,12 @@ def main():
     try:
 
         sniff(
-            iface=NETWORK_INTERFACE,
-            filter=BPF_FILTER,
+            iface=args.interface or NETWORK_INTERFACE,
+            filter=args.filter or BPF_FILTER,
+            count=args.count or MAX_PACKET_COUNT,
             prn=handle_packet,
-            count=MAX_PACKET_COUNT,
             store=False,
-        )
+            )
 
     except KeyboardInterrupt:
 
