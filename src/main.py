@@ -25,7 +25,17 @@ from utils import (
     print_banner,
 
 )
+
+
+
+from statistics import Statistics
+
+from pcap_exporter import (
+    export_pcap,
+    close_pcap,
+)
 args = parse_arguments()
+stats = Statistics()
 
 def handle_packet(packet):
     """
@@ -36,9 +46,13 @@ def handle_packet(packet):
 
         packet_info = parse_packet(packet)
 
+        stats.update(packet_info)
+
         display_packet(packet_info)
 
         export_packet(packet_info)
+
+        export_pcap(packet)
 
     except Exception:
 
@@ -85,9 +99,11 @@ def main():
         log_exception("Unexpected application error.")
 
     finally:
-
+        stats.print_summary()
+        close_pcap()
         log_info("Application terminated.")
-
+         
+       
 
 if __name__ == "__main__":
     main()

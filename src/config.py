@@ -159,6 +159,11 @@ EXPORT_JSON = True
 JSON_FILE = "../exports/packets.json"
 
 
+
+EXPORT_PCAP = True
+
+PCAP_FILE = "../exports/capture.pcap"
+
 # ==============================================================================
 # Terminal Display
 # ==============================================================================
