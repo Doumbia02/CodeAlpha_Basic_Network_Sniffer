@@ -1,51 +1,54 @@
 """
 display.py
------------
+----------
 
-Handles all terminal output.
+Responsible for displaying packets in the terminal.
 
-This module is responsible ONLY for displaying packet
-information in a readable format.
+This module does not know anything about Scapy.
+It only receives PacketInfo objects.
 """
 
-from datetime import datetime
-
-from colorama import Fore, Style, init
+from colorama import Fore
+from colorama import Style
+from colorama import init
 
 from config import (
+    HEADER_REPEAT_INTERVAL,
+    MAX_PAYLOAD_LENGTH,
     SHOW_PACKET_LENGTH,
     SHOW_PAYLOAD,
     SHOW_PORTS,
     SHOW_TIMESTAMP,
-    SHOW_TTL,
-    MAX_PAYLOAD_LENGTH,
+)
+
+from models import PacketInfo
+
+from utils import (
+    format_timestamp,
+    safe_value,
+    truncate_text,
 )
 
 # Initialize Colorama
 init(autoreset=True)
 
-# Used to know when to print the table header again
+# Internal packet counter
 _packet_counter = 0
-
-
-def format_timestamp(timestamp: float) -> str:
-    """
-    Convert Unix timestamp to HH:MM:SS.
-    """
-    return datetime.fromtimestamp(timestamp).strftime("%H:%M:%S")
 
 
 def protocol_color(protocol: str) -> str:
     """
-    Return the appropriate color for each protocol.
+    Return the display color for a protocol.
     """
+
+    protocol = protocol.upper()
 
     colors = {
         "TCP": Fore.GREEN,
         "UDP": Fore.CYAN,
-        "DNS": Fore.MAGENTA,
         "ICMP": Fore.YELLOW,
         "ARP": Fore.BLUE,
+        "DNS": Fore.MAGENTA,
     }
 
     return colors.get(protocol, Fore.WHITE)
@@ -53,24 +56,24 @@ def protocol_color(protocol: str) -> str:
 
 def print_header() -> None:
     """
-    Print the table header.
+    Print the packet table header.
     """
 
-    print("=" * 120)
+    print("=" * 115)
 
     print(
-        f"{'Time':<10}"
+        f"{'Time':<20}"
         f"{'Protocol':<12}"
-        f"{'Source IP':<20}"
-        f"{'Destination IP':<20}"
-        f"{'Ports':<18}"
-        f"{'Length':<10}"
+        f"{'Source IP':<18}"
+        f"{'Destination IP':<18}"
+        f"{'Ports':<20}"
+        f"{'Length':<8}"
     )
 
-    print("=" * 120)
+    print("=" * 115)
 
 
-def display_packet(packet_info: dict) -> None:
+def display_packet(packet: PacketInfo) -> None:
     """
     Display one parsed packet.
     """
@@ -79,90 +82,80 @@ def display_packet(packet_info: dict) -> None:
 
     _packet_counter += 1
 
-    if _packet_counter == 1 or _packet_counter % 25 == 0:
+    if (
+        _packet_counter == 1
+        or _packet_counter % HEADER_REPEAT_INTERVAL == 0
+    ):
         print_header()
 
-    # -----------------------------
+    # ---------------------------------------
     # Timestamp
-    # -----------------------------
+    # ---------------------------------------
 
     timestamp = ""
 
     if SHOW_TIMESTAMP:
-        timestamp = format_timestamp(packet_info.timestamp)
+        timestamp = format_timestamp(packet.timestamp)
 
-    # -----------------------------
+    # ---------------------------------------
     # Protocol
-    # -----------------------------
+    # ---------------------------------------
 
-    protocol = packet_info.protocol
-
-    colored_protocol = (
-        protocol_color(protocol)
-        + f"{protocol:<12}"
+    protocol = (
+        protocol_color(packet.protocol)
+        + f"{packet.protocol:<12}"
         + Style.RESET_ALL
     )
 
-    # -----------------------------
-    # IP Addresses
-    # -----------------------------
-
-    source_ip = packet_info.source_ip or "-"
-
-    destination_ip = packet_info.destination_ip or "-"
-
-    # -----------------------------
+    # ---------------------------------------
     # Ports
-    # -----------------------------
+    # ---------------------------------------
 
     ports = "-"
 
-    if SHOW_PORTS:
+    if (
+        SHOW_PORTS
+        and packet.source_port is not None
+        and packet.destination_port is not None
+    ):
+        ports = f"{packet.source_port} → {packet.destination_port}"
 
-        src = packet_info.source_port
-
-        dst = packet_info.destination_port
-
-        if src is not None and dst is not None:
-            ports = f"{src} → {dst}"
-
-    # -----------------------------
+    # ---------------------------------------
     # Length
-    # -----------------------------
+    # ---------------------------------------
 
     length = ""
 
     if SHOW_PACKET_LENGTH:
-        length = str(packet_info.length)
+        length = str(packet.length)
 
-    # -----------------------------
-    # Main Row
-    # -----------------------------
+    # ---------------------------------------
+    # Print Row
+    # ---------------------------------------
 
     print(
-        f"{timestamp:<10}"
-        f"{colored_protocol}"
-        f"{source_ip:<20}"
-        f"{destination_ip:<20}"
-        f"{ports:<18}"
-        f"{length:<10}"
+        f"{timestamp:<20}"
+        f"{protocol}"
+        f"{safe_value(packet.source_ip):<18}"
+        f"{safe_value(packet.destination_ip):<18}"
+        f"{ports:<20}"
+        f"{length:<8}"
     )
 
-    # -----------------------------
+    # ---------------------------------------
     # Payload
-    # -----------------------------
+    # ---------------------------------------
 
-    if SHOW_PAYLOAD:
+    if SHOW_PAYLOAD and packet.payload:
 
-        payload = packet_info.payload
+        payload = truncate_text(
+            packet.payload,
+            MAX_PAYLOAD_LENGTH,
+        )
 
-        if payload:
-
-            payload = payload.replace("\n", " ")
-
-            if len(payload) > MAX_PAYLOAD_LENGTH:
-                payload = payload[:MAX_PAYLOAD_LENGTH] + "..."
-
-            print(
-                f"   Payload: {Fore.LIGHTBLACK_EX}{payload}{Style.RESET_ALL}"
-            )
+        print(
+            f"    Payload: "
+            f"{Fore.LIGHTBLACK_EX}"
+            f"{payload}"
+            f"{Style.RESET_ALL}"
+        )
