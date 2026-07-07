@@ -12,7 +12,6 @@ from pathlib import Path
 
 from config import ENABLE_LOGGING, LOG_FILE, LOG_LEVEL
 
-
 _logger = None
 
 

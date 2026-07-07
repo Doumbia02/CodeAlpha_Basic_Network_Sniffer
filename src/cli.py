@@ -15,7 +15,7 @@ def parse_arguments() -> Namespace:
 
     parser = ArgumentParser(
         prog="Network Packet Sniffer",
-        description="Capture and analyze network packets using Scapy."
+        description="Capture and analyze network packets using Scapy.",
     )
 
     parser.add_argument(

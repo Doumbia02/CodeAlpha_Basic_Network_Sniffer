@@ -1,57 +1,3 @@
-"""
-Project configuration.
-
-This file contains values that may change depending on
-the user's computer or preferences.
-
-
-# ==========================
-# Network Configuration
-# ==========================
-
-# Network interface.
-# None means Scapy automatically selects the default interface.
-NETWORK_INTERFACE = None
-
-# Capture only these protocols.
-# Set to None to capture everything.
-BPF_FILTER = None
-
-# ==========================
-# Display Configuration
-# ==========================
-
-SHOW_PAYLOAD = True
-MAX_PAYLOAD_LENGTH = 80
-
-# ==========================
-# Logging
-# ==========================
-
-ENABLE_LOGGING = True
-LOG_FILE = "../logs/sniffer.log"
-
-# ==========================
-# Export
-# ==========================
-
-#EXPORT_CSV = True
-#EXPORT_JSON = True
-
-#CSV_FILE = "../exports/packets.csv"
-#JSON_FILE = "../exports/packets.json"
-"""
-"""
-config.py
----------
-
-Central configuration file for the Network Packet Sniffer.
-
-This file contains all configurable settings used throughout the project.
-Changing values here allows you to customize the application's behavior
-without modifying the rest of the source code.
-"""
-
 # ==============================================================================
 # Network Configuration
 # ==============================================================================
@@ -147,7 +93,7 @@ LOG_LEVEL = "INFO"
 
 EXPORT_CSV = True
 
-CSV_FILE = "../exports/packets.csv"
+CSV_FILE = "exports/packets.csv"
 
 
 # ==============================================================================
@@ -156,13 +102,12 @@ CSV_FILE = "../exports/packets.csv"
 
 EXPORT_JSON = True
 
-JSON_FILE = "../exports/packets.json"
-
+JSON_FILE = "exports/packets.json"
 
 
 EXPORT_PCAP = True
 
-PCAP_FILE = "../exports/capture.pcap"
+PCAP_FILE = "exports/capture.pcap"
 
 # ==============================================================================
 # Terminal Display

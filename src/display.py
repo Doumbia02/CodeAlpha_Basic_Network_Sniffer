@@ -28,12 +28,18 @@ from utils import (
     safe_value,
     truncate_text,
 )
+from scapy.all import hexdump
 
 # Initialize Colorama
 init(autoreset=True)
 
 # Internal packet counter
 _packet_counter = 0
+
+
+def display_payload(packet):
+    if packet.haslayer("Raw"):
+        hexdump(packet["Raw"].load)
 
 
 def protocol_color(protocol: str) -> str:
@@ -82,10 +88,7 @@ def display_packet(packet: PacketInfo) -> None:
 
     _packet_counter += 1
 
-    if (
-        _packet_counter == 1
-        or _packet_counter % HEADER_REPEAT_INTERVAL == 0
-    ):
+    if _packet_counter == 1 or _packet_counter % HEADER_REPEAT_INTERVAL == 0:
         print_header()
 
     # ---------------------------------------
@@ -102,9 +105,7 @@ def display_packet(packet: PacketInfo) -> None:
     # ---------------------------------------
 
     protocol = (
-        protocol_color(packet.protocol)
-        + f"{packet.protocol:<12}"
-        + Style.RESET_ALL
+        protocol_color(packet.protocol) + f"{packet.protocol:<12}" + Style.RESET_ALL
     )
 
     # ---------------------------------------
@@ -154,8 +155,5 @@ def display_packet(packet: PacketInfo) -> None:
         )
 
         print(
-            f"    Payload: "
-            f"{Fore.LIGHTBLACK_EX}"
-            f"{payload}"
-            f"{Style.RESET_ALL}"
+            f"    Payload: " f"{Fore.LIGHTBLACK_EX}" f"{payload}" f"{Style.RESET_ALL}"
         )

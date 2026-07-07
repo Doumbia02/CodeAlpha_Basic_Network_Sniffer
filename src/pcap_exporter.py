@@ -10,7 +10,6 @@ from scapy.all import PcapWriter
 
 from config import PCAP_FILE, EXPORT_PCAP
 
-
 _writer = None
 
 

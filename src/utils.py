@@ -23,9 +23,7 @@ def format_timestamp(timestamp: float) -> str:
         2026-07-06 18:42:01
     """
 
-    return datetime.fromtimestamp(timestamp).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+    return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def truncate_text(text: str | None, max_length: int) -> str:
