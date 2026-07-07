@@ -11,3 +11,5 @@ Traceback (most recent call last):
 PermissionError: [Errno 13] Permission denied: '../exports/packets.csv'
 2026-07-06 22:14:38 | INFO     | Application terminated.
 2026-07-06 22:18:54 | INFO     | Application started.
+2026-07-08 01:51:39 | INFO     | Application started.
+2026-07-08 01:51:47 | INFO     | Application terminated.
