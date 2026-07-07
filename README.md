@@ -1171,13 +1171,13 @@ Interests:
 GitHub:
 
 ```
-https://github.com/<your-username>
+https://github.com/Doumbia02
 ```
 
 LinkedIn:
 
 ```
-https://linkedin.com/in/<your-profile>
+linkedin.com/in/youssouf-doumbia-977413257
 ```
 
 ---
