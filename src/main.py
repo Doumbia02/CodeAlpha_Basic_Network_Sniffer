@@ -33,7 +33,6 @@ from pcap_exporter import (
 )
 from dashboard import show_statistics
 
-
 args = parse_arguments()
 stats = Statistics()
 
@@ -82,7 +81,7 @@ def main():
     except Exception:
         log_exception("Unexpected application error.")
     finally:
-        show_statistics(stats) 
+        show_statistics(stats)
         close_pcap()
         log_info("Application terminated.")
 

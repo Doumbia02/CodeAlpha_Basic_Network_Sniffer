@@ -30,9 +30,4 @@ def show_statistics(stats):
     table.add_row("Duration", f"{stats.duration:.2f}s")
     table.add_row("PPS", f"{stats.packets_per_second:.2f}")
 
-    console.print(
-        Panel(
-            table,
-            title="Capture Statistics"
-        )
-    )
+    console.print(Panel(table, title="Capture Statistics"))
