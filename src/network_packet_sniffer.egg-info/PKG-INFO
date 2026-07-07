@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: network-packet-sniffer
+Version: 1.0.0
+Summary: A professional network packet sniffer built with Python and Scapy.
+Author: Youssouf Doumbia
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: scapy
+Requires-Dist: rich
+Requires-Dist: colorama
+Requires-Dist: python-dotenv

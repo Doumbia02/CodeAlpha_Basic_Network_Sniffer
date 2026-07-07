@@ -5,6 +5,7 @@ main.py
 Entry point of the Network Packet Sniffer.
 """
 
+
 from cli import parse_arguments
 from scapy.all import sniff
 
