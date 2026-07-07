@@ -13,6 +13,11 @@
 #     "eth0"   -> Linux Ethernet
 #     "wlan0"  -> Linux Wi-Fi
 #
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 NETWORK_INTERFACE = "en0"
 
 
