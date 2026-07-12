@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Awareness — Interactive Quiz</title>
+<style>
+  :root{
+    --navy:#1E2761; --navy-dk:#141B47; --ice:#CADCFC; --red:#E63946;
+    --green:#2A9D6F; --grey:#5A6B8C; --bg:#F6F8FC; --text:#1B2033;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Calibri,'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text);
+    display:flex; justify-content:center; padding:32px 16px;
+  }
+  .wrap{max-width:720px; width:100%;}
+  header{background:var(--navy); border-radius:14px; padding:28px 30px; color:#fff; margin-bottom:24px;}
+  header .kicker{color:var(--red); font-weight:bold; letter-spacing:2px; font-size:12px; text-transform:uppercase;}
+  header h1{font-family:Cambria,Georgia,serif; margin:8px 0 6px; font-size:28px;}
+  header p{margin:0; color:var(--ice); font-size:14px;}
+  #progress-wrap{height:8px; background:#2B3568; border-radius:6px; margin-top:18px; overflow:hidden;}
+  #progress-bar{height:100%; width:0%; background:var(--red); transition:width .3s ease;}
+  .card{background:#fff; border-radius:14px; padding:26px 28px; box-shadow:0 6px 18px rgba(59,74,107,.15); margin-bottom:18px;}
+  .qnum{font-size:12px; font-weight:bold; color:var(--grey); letter-spacing:1px; text-transform:uppercase;}
+  .qtitle{font-family:Cambria,Georgia,serif; font-size:19px; font-weight:bold; margin:6px 0 10px;}
+  .scenario{font-size:14px; color:var(--grey); line-height:1.5; margin-bottom:18px;}
+  .opt{
+    display:flex; align-items:flex-start; gap:12px; padding:13px 14px; border:1.5px solid #DDE3F0;
+    border-radius:10px; margin-bottom:10px; cursor:pointer; transition:.15s; font-size:14px; line-height:1.4;
+  }
+  .opt:hover{border-color:var(--navy); background:#F0F3FB;}
+  .opt .letter{
+    flex:0 0 26px; height:26px; border-radius:50%; background:var(--navy); color:#fff; font-size:12px;
+    font-weight:bold; display:flex; align-items:center; justify-content:center;
+  }
+  .opt.correct{border-color:var(--green); background:#EAF7F1;}
+  .opt.correct .letter{background:var(--green);}
+  .opt.wrong{border-color:var(--red); background:#FDECEE;}
+  .opt.wrong .letter{background:var(--red);}
+  .opt.disabled{cursor:default;}
+  .explain{
+    display:none; margin-top:14px; padding:14px 16px; background:var(--navy-dk); color:var(--ice);
+    border-radius:10px; font-size:13.5px; line-height:1.5;
+  }
+  .explain.show{display:block;}
+  .explain b{color:#fff;}
+  .nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  button.next{
+    background:var(--red); color:#fff; border:none; padding:11px 22px; border-radius:8px;
+    font-size:14px; font-weight:bold; cursor:pointer; display:none;
+  }
+  button.next.show{display:inline-block;}
+  button.next:hover{background:#cf313e;}
+  #result{display:none; text-align:center; background:var(--navy); color:#fff; border-radius:14px; padding:36px 28px;}
+  #result h2{font-family:Cambria,Georgia,serif; font-size:26px; margin:0 0 6px;}
+  #result .score{font-size:52px; font-weight:bold; color:var(--red); font-family:Cambria,Georgia,serif; margin:10px 0;}
+  #result p{color:var(--ice); font-size:14px; line-height:1.5; max-width:480px; margin:0 auto 20px;}
+  #result button{
+    background:var(--red); color:#fff; border:none; padding:11px 24px; border-radius:8px;
+    font-size:14px; font-weight:bold; cursor:pointer;
+  }
+  .quiz-area.done{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Security Awareness Training</div>
+    <h1>Spot the Phish</h1>
+    <p>Five real-world scenarios. Pick the safest response, get instant feedback, and see your score at the end.</p>
+    <div id="progress-wrap"><div id="progress-bar"></div></div>
+  </header>
+
+  <div class="quiz-area" id="quiz-area"></div>
+
+  <div id="result">
+    <h2>Training complete</h2>
+    <div class="score" id="score-display">0 / 0</div>
+    <p id="result-msg"></p>
+    <button onclick="restart()">Try again</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    num: "Scenario 1 of 5",
+    title: "A colleague emails asking you to buy gift cards for a client event.",
+    scenario: "The message appears to come from your CFO's exact email address. It says she's in back-to-back meetings, needs five $100 gift cards for a client gift right now, and asks you to email the card codes as soon as you buy them.",
+    options: [
+      "Buy the cards immediately since it's from the CFO and marked urgent.",
+      "Reply asking for more details in the same email thread.",
+      "Contact the CFO through a known number or in person before doing anything.",
+      "Ignore the email completely and don't tell anyone."
+    ],
+    correct: 2,
+    explain: "This is a classic gift-card business email compromise: urgency, an authority figure, and a request outside normal purchasing channels. Even a correct-looking email address can be spoofed, so replying to the same thread just confirms the attacker's email works. Verify through a separate, already-known channel — a phone call or a walk down the hall — before spending anything, and report the message so security can warn others."
+  },
+  {
+    num: "Scenario 2 of 5",
+    title: "You get a text saying a package couldn't be delivered.",
+    scenario: "The SMS claims to be from a shipping carrier: \"We attempted delivery but could not access your address. Reschedule here: bit.ly/redeliver-pkg2847.\" You aren't expecting a package.",
+    options: [
+      "Tap the link to check the delivery details, just to be safe.",
+      "Delete the text, and if concerned, check tracking directly on the carrier's official app or site.",
+      "Reply \"STOP\" to the number to unsubscribe.",
+      "Forward it to a friend to ask if they've gotten one too."
+    ],
+    correct: 1,
+    explain: "This is smishing — phishing by text. A shortened, unfamiliar link, an unexpected package, and a vague \"couldn't deliver\" story are hallmarks of the scam. Tapping the link or replying both confirm your number is active, inviting more attempts. Go directly to the carrier's official app or site (typed in yourself) if you want to double-check, then delete the message."
+  },
+  {
+    num: "Scenario 3 of 5",
+    title: "IT calls asking you to confirm your login code.",
+    scenario: "A caller says they're from your company's help desk resolving a \"flagged security issue\" on your account, and asks you to read them the six-digit code that just arrived by text so they can \"verify your identity.\"",
+    options: [
+      "Read the code — it's only useful with your password, which they didn't ask for.",
+      "Hang up and contact IT using the number listed in your company's internal directory.",
+      "Ask the caller for their employee ID number before giving the code.",
+      "Text the code to them instead of reading it aloud."
+    ],
+    correct: 1,
+    explain: "A one-time code proves it's really you logging in — sharing it hands that proof straight to an attacker who likely already has your password from a prior breach. This mirrors real help-desk vishing incidents, including the 2023 MGM Resorts breach, where a confident, plausible caller was all it took. No legitimate IT team needs your one-time code read aloud. Hang up and call back on a verified, independently-sourced number."
+  },
+  {
+    num: "Scenario 4 of 5",
+    title: "An email from 'Microsoft 365' warns your storage is full.",
+    scenario: "The email has the real Microsoft logo and says your mailbox is 98% full and will stop receiving mail unless you 'Sign in to upgrade' within 12 hours. The link goes to a page asking for your work email and password.",
+    options: [
+      "Sign in on the page to fix the storage issue before you lose email access.",
+      "Check your actual storage by opening Microsoft 365 directly (not via the link) or through your admin.",
+      "Forward the email to coworkers so they can fix their storage too.",
+      "Reply to the sender asking if this is legitimate."
+    ],
+    correct: 1,
+    explain: "A convincing logo proves nothing — logos are trivial to copy. A countdown timer and a login page reached via an email link are the real tells here. Go directly to a service you already trust (typed URL, bookmark, or official app) instead of any link in the email. If storage really is low, you'll see it there; if not, the email was fake, and it's worth reporting."
+  },
+  {
+    num: "Scenario 5 of 5",
+    title: "A shared 'invoice' link lands in your inbox from a real client.",
+    scenario: "A known client's actual email account sends a Google Drive link to an \"overdue invoice.\" The link asks you to grant a document-viewer app permission to access your email and files before you can view it.",
+    options: [
+      "Grant access — it's coming from a real client's account, so it must be safe.",
+      "Decline the permission request and verify with the client through a separate channel before proceeding.",
+      "Grant limited access just to view the file, then remove it later.",
+      "Forward it to IT without telling the client anything."
+    ],
+    correct: 1,
+    explain: "This mirrors the real 2017 Google Docs worm: attackers compromised real accounts and used them to request third-party app permissions, which then self-propagated to the victim's own contacts. A genuine sender doesn't guarantee a genuine link — accounts get compromised. Never grant an app broad access to your email or files based on a request alone; verify with the sender directly, and review connected app permissions periodically."
+  }
+];
+
+let current = 0;
+let score = 0;
+const quizArea = document.getElementById('quiz-area');
+const progressBar = document.getElementById('progress-bar');
+
+function render() {
+  progressBar.style.width = (current / questions.length * 100) + '%';
+  const q = questions[current];
+  const letters = ['A','B','C','D'];
+  let html = `<div class="card">
+    <div class="qnum">${q.num}</div>
+    <div class="qtitle">${q.title}</div>
+    <div class="scenario">${q.scenario}</div>
+    <div id="options"></div>
+    <div class="explain" id="explain"><b>Why:</b> ${q.explain}</div>
+    <div class="nav"><button class="next" id="next-btn">Continue</button></div>
+  </div>`;
+  quizArea.innerHTML = html;
+  const optWrap = document.getElementById('options');
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'opt';
+    div.innerHTML = `<div class="letter">${letters[i]}</div><div>${opt}</div>`;
+    div.onclick = () => selectAnswer(i, div);
+    optWrap.appendChild(div);
+  });
+}
+
+function selectAnswer(i, el) {
+  const q = questions[current];
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  opts.forEach(o => o.onclick = null);
+  if (i === q.correct) {
+    el.classList.add('correct');
+    score++;
+  } else {
+    el.classList.add('wrong');
+    opts[q.correct].classList.add('correct');
+  }
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('next-btn').classList.add('show');
+  document.getElementById('next-btn').onclick = nextQuestion;
+}
+
+function nextQuestion() {
+  current++;
+  if (current < questions.length) {
+    render();
+  } else {
+    finish();
+  }
+}
+
+function finish() {
+  progressBar.style.width = '100%';
+  document.getElementById('quiz-area').classList.add('done');
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('score-display').textContent = score + ' / ' + questions.length;
+  let msg;
+  if (score === questions.length) msg = "Perfect score! You caught every red flag — urgency, spoofed authority, and requests to bypass normal verification.";
+  else if (score >= questions.length - 1) msg = "Great instincts. Review the explanation above for the one you missed, and you're set.";
+  else if (score >= questions.length / 2) msg = "Good start. The common thread in every scenario: pause and verify through a separate channel before acting.";
+  else msg = "Worth a second pass through the training deck — especially the sections on social engineering tactics and verification habits.";
+  document.getElementById('result-msg').textContent = msg;
+}
+
+function restart() {
+  current = 0;
+  score = 0;
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('quiz-area').classList.remove('done');
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
